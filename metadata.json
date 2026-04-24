@@ -1,0 +1,6 @@
+{
+  "name": "BTEC Hospitality Portfolio Generator",
+  "description": "Automates the generation of BTEC Hospitality learner portfolios using reference PDFs and templates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
