@@ -13,6 +13,21 @@ export default function App() {
   const [assessorName, setAssessorName] = useState('');
   const [verifierName, setVerifierName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showPrintWarning, setShowPrintWarning] = useState<boolean>(false);
+
+  const handleExportPDF = () => {
+    try {
+      if (window.self !== window.top) {
+        setShowPrintWarning(true);
+        setTimeout(() => setShowPrintWarning(false), 10000);
+      } else {
+        window.print();
+      }
+    } catch (e) {
+      setShowPrintWarning(true);
+      setTimeout(() => setShowPrintWarning(false), 10000);
+    }
+  };
   
   const [learners, setLearners] = useState<Learner[]>([
     { id: '1', name: '', regNo: '' },
@@ -103,7 +118,7 @@ export default function App() {
              </select>
              <button 
                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition-colors w-full sm:w-auto"
-               onClick={() => window.print()}
+               onClick={handleExportPDF}
              >
                <Download className="w-4 h-4" />
                <span>Export PDF</span>
@@ -111,7 +126,20 @@ export default function App() {
           </div>
         </header>
         
-        <main className="flex-grow overflow-auto p-4 sm:p-8 flex flex-col items-center print:p-0 print:m-0">
+        <main className="flex-grow overflow-auto p-4 sm:p-8 flex flex-col items-center print:p-0 print:m-0 relative">
+           
+           {showPrintWarning && (
+             <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-amber-100 border border-amber-300 text-amber-900 px-6 py-4 rounded-lg shadow-lg z-50 max-w-lg w-[calc(100%-2rem)] flex gap-3 text-sm animate-in fade-in slide-in-from-top-4 print:hidden">
+               <div className="shrink-0 flex items-center justify-center pt-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+               </div>
+               <div>
+                 <p className="font-bold mb-1">Printing is restricted in preview</p>
+                 <p>Because you are viewing this app within an embedded preview, your browser blocks the print dialog. To export to PDF, please click the "<b>Open in new tab</b>" icon at the top right of the whole page, and then click Export PDF there.</p>
+               </div>
+             </div>
+           )}
+
            <div className="w-full max-w-[210mm] print:max-w-none">
              <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-8 text-sm flex gap-3 print:hidden">
                 <FileCheck2 className="w-5 h-5 shrink-0 text-blue-600" />
@@ -123,7 +151,7 @@ export default function App() {
 
              <div className="generated-documents print:m-0 print:p-0">
                {(selectedDocType === 'all' || selectedDocType === 'iv_brief') && <IVAssignmentBrief learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
-               {(selectedDocType === 'all' || selectedDocType === 'practical') && <RecordOfPracticalActivity learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'practical') && <RecordOfPracticalActivity learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} practicalCriteria={activeUnit.practicalCriteria} />}
                {(selectedDocType === 'all' || selectedDocType === 'assessment') && <AssessmentRecord learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
                {(selectedDocType === 'all' || selectedDocType === 'iv_decisions') && <IVAssessmentDecisions learner={activeLearner} allLearners={learners.filter(l => l.name)} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
                {(selectedDocType === 'all' || selectedDocType === 'cover') && <UnitAssignmentCover learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
