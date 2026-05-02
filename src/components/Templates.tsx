@@ -16,6 +16,7 @@ interface TemplateProps {
   unitTitle?: string;
   assignmentTitle?: string;
   criteria?: string;
+  practicalCriteria?: string[];
 }
 
 // Reusable parts
@@ -28,6 +29,10 @@ const PrintStyles = () => (
       }
       .landscape-page {
         page: landscape-page;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
     }
   `}} />
@@ -57,21 +62,21 @@ const Table = ({ children, className = "" }: { children: React.ReactNode, classN
   </table>
 );
 
-const Tr = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
-  <tr className={className}>{children}</tr>
+const Tr = ({ children, className = "", ...props }: { children?: React.ReactNode, className?: string, [key: string]: any }) => (
+  <tr className={className} {...props}>{children}</tr>
 );
 
-const Th = ({ children, colSpan, rowSpan, className = "" }: { children: React.ReactNode, colSpan?: number, rowSpan?: number, className?: string }) => {
+const Th = ({ children, colSpan, rowSpan, className = "", ...props }: { children?: React.ReactNode, colSpan?: number, rowSpan?: number, className?: string, [key: string]: any }) => {
   const hasWidth = className.includes('w-') || colSpan;
   return (
-    <th colSpan={colSpan} rowSpan={rowSpan} className={`border border-[#85bfe0] bg-[#eef6fa] text-[#005c8a] p-2 text-left font-semibold align-top ${hasWidth ? '' : 'w-1/3'} ${className}`}>
+    <th colSpan={colSpan} rowSpan={rowSpan} className={`border border-[#85bfe0] bg-[#eef6fa] text-[#005c8a] p-2 text-left font-semibold align-top ${hasWidth ? '' : 'w-1/3'} ${className}`} {...props}>
       {children}
     </th>
   );
 };
 
-const Td = ({ children, colSpan, rowSpan, className = "" }: { children: React.ReactNode, colSpan?: number, rowSpan?: number, className?: string }) => (
-  <td colSpan={colSpan} rowSpan={rowSpan} className={`border border-[#85bfe0] p-2 align-top text-slate-700 ${className}`}>
+const Td = ({ children, colSpan, rowSpan, className = "", ...props }: { children?: React.ReactNode, colSpan?: number, rowSpan?: number, className?: string, [key: string]: any }) => (
+  <td colSpan={colSpan} rowSpan={rowSpan} className={`border border-[#85bfe0] p-2 align-top text-slate-700 ${className}`} {...props}>
     {children || <span className="opacity-0">-</span>}
   </td>
 );
@@ -121,7 +126,36 @@ export const IVAssignmentBrief: React.FC<TemplateProps> = ({ assessorName, verif
 );
 
 // 2. Record of Practical Activity
-export const RecordOfPracticalActivity: React.FC<TemplateProps> = ({ learner, assessorName, date, unitTitle, criteria }) => (
+export const RecordOfPracticalActivity: React.FC<TemplateProps> = ({ learner, assessorName, date, unitTitle, criteria, practicalCriteria }) => {
+  const selectedCriteria = practicalCriteria && practicalCriteria.length > 0 
+    ? practicalCriteria 
+    : [];
+
+  const practicalComments = [
+    "demonstrated excellent preparation and clear communication during the session.",
+    "showed confidence when presenting to the group, using appropriate tone and body language.",
+    "effectively handled the simulated scenario, showing good problem-solving skills.",
+    "exhibited professional behavior and followed all safety guidelines correctly.",
+    "managed the task efficiently and engaged well with peers during the activity.",
+    "showed a clear understanding of the practical requirements and executed them smoothly.",
+    "communicated key points effectively and responded well to follow-up questions.",
+    "displayed a high level of teamwork and supported others during the activity."
+  ];
+
+  const getHash = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    return Math.abs(hash);
+  };
+
+  const getObservation = (learnerName: string, criterion: string) => {
+    const index = getHash((learnerName || 'anon') + criterion + (unitTitle || '')) % practicalComments.length;
+    return `For ${criterion}, the learner ${practicalComments[index]}`;
+  };
+
+  const fullObservation = selectedCriteria.map(p => getObservation(learner.name, p)).join('\n\n');
+
+  return (
   <Page>
     <div className="flex justify-end mb-6">
        <div className="text-[#005c8a] font-bold text-xl flex items-center gap-2">Pearson | BTEC</div>
@@ -141,23 +175,27 @@ export const RecordOfPracticalActivity: React.FC<TemplateProps> = ({ learner, as
         <Tr><Th>Name of *Observer/*Witness:</Th><Td>{assessorName}</Td></Tr>
         <Tr><Th>Date of Activity:</Th><Td>{date}</Td></Tr>
         <Tr><Th colSpan={2}>Assessment criteria targeted:</Th></Tr>
-        <Tr><Td colSpan={2} className="h-8">{criteria || 'P1, P2'}</Td></Tr>
-        <Tr><Th colSpan={2}>Description of activity undertaken:</Th></Tr>
-        <Tr><Td colSpan={2} className="h-32">Learner demonstrated understanding of the hospitality sector...</Td></Tr>
+        <Tr><Td colSpan={2} className="h-8 font-semibold">{selectedCriteria.length > 0 ? selectedCriteria.join(', ') : 'None'}</Td></Tr>
+        <Tr><Th colSpan={2}>Description of activity undertaken (Observation Report):</Th></Tr>
+        <Tr>
+          <Td colSpan={2} className="h-48 text-[11px] leading-relaxed whitespace-pre-wrap">
+            {selectedCriteria.length > 0 ? fullObservation : "No specific practical demonstration, role play, presentation, interview or cooking tasks are required for the Pass criteria of this unit."}
+          </Td>
+        </Tr>
         <Tr><Th colSpan={2}>Please state the evidence this record is in support of:</Th></Tr>
-        <Tr><Td colSpan={2} className="h-16">Unit 1 Portfolio evidence</Td></Tr>
+        <Tr><Td colSpan={2} className="h-10 italic">Practical observation notes for {unitTitle || 'this unit'} portfolio.</Td></Tr>
       </tbody>
     </Table>
     <div className="mb-2 text-xs font-semibold text-[#005c8a] bg-[#eef6fa] p-2 border border-[#85bfe0]">I confirm this is an accurate record of the activity undertaken</div>
     <Table>
       <tbody>
-        <Tr><Th>Learner signature:</Th><Td>{learner.name}</Td><Th>Date:</Th><Td>{date}</Td></Tr>
-        <Tr><Th colSpan={2}>*Assessor/*Witness signature:</Th><Td colSpan={2}>{assessorName}</Td></Tr>
+        <Tr><Th>Learner signature:</Th><Td className="italic font-semibold">{learner.name}</Td><Th>Date:</Th><Td>{date}</Td></Tr>
+        <Tr><Th colSpan={2}>*Assessor/*Witness signature:</Th><Td colSpan={2} className="italic font-semibold">{assessorName}</Td></Tr>
         <Tr><Th>Role:</Th><Td>Assessor</Td><Th>Date:</Th><Td>{date}</Td></Tr>
       </tbody>
     </Table>
   </Page>
-);
+)};
 
 // 3. Assessment Record
 export const AssessmentRecord: React.FC<TemplateProps> = ({ learner, assessorName, date, programmeTitle, unitTitle, assignmentTitle, criteria }) => {
