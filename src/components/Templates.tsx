@@ -12,6 +12,9 @@ interface TemplateProps {
   assessorName: string;
   verifierName: string;
   date: string;
+  dateIssued?: string;
+  deadline?: string;
+  finalDeadline?: string;
   programmeTitle?: string;
   unitTitle?: string;
   assignmentTitle?: string;
@@ -82,7 +85,7 @@ const Td = ({ children, colSpan, rowSpan, className = "", ...props }: { children
 );
 
 // 1. IV Assignment Brief
-export const IVAssignmentBrief: React.FC<TemplateProps> = ({ assessorName, verifierName, date, programmeTitle, unitTitle, assignmentTitle, criteria }) => (
+export const IVAssignmentBrief: React.FC<TemplateProps> = ({ assessorName, verifierName, dateIssued, programmeTitle, unitTitle, assignmentTitle, criteria }) => (
   <Page>
     <div className="flex justify-end mb-6">
        <div className="text-[#005c8a] font-bold text-xl flex items-center gap-2">Pearson | BTEC</div>
@@ -115,10 +118,10 @@ export const IVAssignmentBrief: React.FC<TemplateProps> = ({ assessorName, verif
         <Tr><Th colSpan={3}>Action required:</Th></Tr>
         <Tr><Td colSpan={3} className="h-16">n/a</Td></Tr>
         <Tr>
-          <Th>Internal Verifier signature</Th><Td>{verifierName}</Td><Th>Date</Th><Td>{date}</Td>
+          <Th>Internal Verifier signature</Th><Td>{verifierName}</Td><Th>Date</Th><Td>{dateIssued}</Td>
         </Tr>
         <Tr>
-          <Th>Assessor signature</Th><Td>{assessorName}</Td><Th>Date</Th><Td>{date}</Td>
+          <Th>Assessor signature</Th><Td>{assessorName}</Td><Th>Date</Th><Td>{dateIssued}</Td>
         </Tr>
       </tbody>
     </Table>
@@ -198,7 +201,7 @@ export const RecordOfPracticalActivity: React.FC<TemplateProps> = ({ learner, as
 )};
 
 // 3. Assessment Record
-export const AssessmentRecord: React.FC<TemplateProps> = ({ learner, assessorName, date, programmeTitle, unitTitle, assignmentTitle, criteria }) => {
+export const AssessmentRecord: React.FC<TemplateProps> = ({ learner, assessorName, date, deadline, programmeTitle, unitTitle, assignmentTitle, criteria }) => {
   const criteriaList = (criteria || 'P1, P2').split(',').map(c => c.trim()).filter(c => c);
 
   const passComments = [
@@ -266,7 +269,7 @@ export const AssessmentRecord: React.FC<TemplateProps> = ({ learner, assessorNam
         </Tr>
         <Tr><Th>Assignment Title</Th><Td>{assignmentTitle || 'Exploring Hospitality'}</Td><Th>Assessor Name</Th><Td>{assessorName}</Td></Tr>
         <Tr><Th>Unit / Component Number and Title</Th><Td colSpan={3}>{unitTitle || 'Unit 1: Introducing the Hospitality Industry'}</Td></Tr>
-        <Tr><Th>Deadline</Th><Td>{date}</Td><Th>Date Submitted</Th><Td>{date}</Td></Tr>
+        <Tr><Th>Deadline</Th><Td>{deadline}</Td><Th>Date Submitted</Th><Td>{date}</Td></Tr>
       </tbody>
     </Table>
     <Table>
@@ -461,7 +464,7 @@ export const IVAssessmentDecisions: React.FC<TemplateProps> = ({ learner, allLea
 };
 
 // 5. Unit Assignment Cover
-export const UnitAssignmentCover: React.FC<TemplateProps> = ({ learner, date, programmeTitle, unitTitle }) => (
+export const UnitAssignmentCover: React.FC<TemplateProps> = ({ learner, date, dateIssued, finalDeadline, programmeTitle, unitTitle }) => (
   <Page>
     <div className="flex justify-start items-center gap-4 mb-10">
        <div className="w-16 h-4 bg-[#00a1e0]"></div>
@@ -471,11 +474,11 @@ export const UnitAssignmentCover: React.FC<TemplateProps> = ({ learner, date, pr
       <tbody>
         <Tr><Th className="w-1/3">LEARNER'S NAME</Th><Td>{learner.name}</Td></Tr>
         <Tr><Th className="w-1/3 bg-[#ccdce8]">REGISTRATION NO</Th><Td className="bg-[#eef2f5]">{learner.regNo}</Td></Tr>
-        <Tr><Th className="w-1/3">SUBSITE (CODE)</Th><Td></Td></Tr>
+        <Tr><Th className="w-1/3">SUBSITE (CODE)</Th><Td>93285O</Td></Tr>
         <Tr><Th className="w-1/3 bg-[#ccdce8]">PROGRAM TITLE & CODE</Th><Td className="bg-[#eef2f5] text-center font-semibold uppercase">{programmeTitle || 'PEARSON BTEC INTERNATIONAL LEVEL 2 CERTIFICATE IN HOSPITALITY'}</Td></Tr>
         <Tr><Th className="w-1/3">UNIT NO & TITLE (GLH)</Th><Td className="text-center font-semibold uppercase">{unitTitle || 'UNIT 1: INTRODUCING THE HOSPITALITY INDUSTRY'}</Td></Tr>
-        <Tr><Th className="w-1/3 bg-[#ccdce8]">DATE ISSUED</Th><Td className="bg-[#eef2f5]"></Td></Tr>
-        <Tr><Th className="w-1/3">FINAL DEADLINE</Th><Td></Td></Tr>
+        <Tr><Th className="w-1/3 bg-[#ccdce8]">DATE ISSUED</Th><Td className="bg-[#eef2f5]">{dateIssued}</Td></Tr>
+        <Tr><Th className="w-1/3">FINAL DEADLINE</Th><Td>{finalDeadline}</Td></Tr>
         <Tr><Th className="w-1/3 bg-[#ccdce8]">SUBMISSION DATE TO ASSESSOR</Th><Td className="bg-[#eef2f5]">{date}</Td></Tr>
       </tbody>
     </Table>
