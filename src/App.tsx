@@ -13,6 +13,9 @@ export default function App() {
   const [assessorName, setAssessorName] = useState('');
   const [verifierName, setVerifierName] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [dateIssued, setDateIssued] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [finalDeadline, setFinalDeadline] = useState('');
   const [showPrintWarning, setShowPrintWarning] = useState<boolean>(false);
 
   const handleExportPDF = () => {
@@ -49,7 +52,7 @@ export default function App() {
   const activeUnit = btecUnits.find(u => u.id === selectedUnitId) || btecUnits[0];
 
   const addLearner = () => {
-    if (learners.length < 10) {
+    if (learners.length < 15) {
       setLearners([...learners, { id: crypto.randomUUID(), name: '', regNo: '' }]);
     }
   };
@@ -150,11 +153,11 @@ export default function App() {
              </div>
 
              <div className="generated-documents print:m-0 print:p-0">
-               {(selectedDocType === 'all' || selectedDocType === 'iv_brief') && <IVAssignmentBrief learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
-               {(selectedDocType === 'all' || selectedDocType === 'practical') && <RecordOfPracticalActivity learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} practicalCriteria={activeUnit.practicalCriteria} />}
-               {(selectedDocType === 'all' || selectedDocType === 'assessment') && <AssessmentRecord learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
-               {(selectedDocType === 'all' || selectedDocType === 'iv_decisions') && <IVAssessmentDecisions learner={activeLearner} allLearners={learners.filter(l => l.name)} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
-               {(selectedDocType === 'all' || selectedDocType === 'cover') && <UnitAssignmentCover learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'iv_brief') && <IVAssignmentBrief learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} dateIssued={dateIssued} deadline={deadline} finalDeadline={finalDeadline} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'practical') && <RecordOfPracticalActivity learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} dateIssued={dateIssued} deadline={deadline} finalDeadline={finalDeadline} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} practicalCriteria={activeUnit.practicalCriteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'assessment') && <AssessmentRecord learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} dateIssued={dateIssued} deadline={deadline} finalDeadline={finalDeadline} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'iv_decisions') && <IVAssessmentDecisions learner={activeLearner} allLearners={learners.filter(l => l.name)} assessorName={assessorName} verifierName={verifierName} date={date} dateIssued={dateIssued} deadline={deadline} finalDeadline={finalDeadline} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
+               {(selectedDocType === 'all' || selectedDocType === 'cover') && <UnitAssignmentCover learner={activeLearner} assessorName={assessorName} verifierName={verifierName} date={date} dateIssued={dateIssued} deadline={deadline} finalDeadline={finalDeadline} unitTitle={activeUnit.title} assignmentTitle={activeUnit.assignmentTitle} criteria={activeUnit.criteria} />}
              </div>
            </div>
         </main>
@@ -211,27 +214,101 @@ export default function App() {
                   placeholder="Enter IV Name..."
                 />
               </div>
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Submission / Assessment Date</label>
-                <div className="flex flex-col gap-2">
-                  <input 
-                    type="date" 
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:opacity-50"
-                    disabled={date === ''}
-                  />
-                  <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Date Issued</label>
+                  <div className="flex flex-col gap-2">
                     <input 
-                      type="checkbox" 
-                      id="leaveDateBlank"
-                      checked={date === ''}
-                      onChange={(e) => setDate(e.target.checked ? '' : new Date().toISOString().split('T')[0])}
-                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                      type="date" 
+                      value={dateIssued}
+                      onChange={(e) => setDateIssued(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[10px] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:opacity-50"
+                      disabled={dateIssued === ''}
                     />
-                    <label htmlFor="leaveDateBlank" className="text-xs text-slate-600 cursor-pointer select-none">
-                      Leave date blank for manual entry
-                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <input 
+                        type="checkbox" 
+                        id="leaveDateIssuedBlank"
+                        checked={dateIssued === ''}
+                        onChange={(e) => setDateIssued(e.target.checked ? '' : new Date().toISOString().split('T')[0])}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-3 h-3"
+                      />
+                      <label htmlFor="leaveDateIssuedBlank" className="text-[10px] text-slate-600 cursor-pointer select-none">
+                        Manual entry
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Deadline / Formative</label>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="date" 
+                      value={deadline}
+                      onChange={(e) => setDeadline(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[10px] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:opacity-50"
+                      disabled={deadline === ''}
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <input 
+                        type="checkbox" 
+                        id="leaveDeadlineBlank"
+                        checked={deadline === ''}
+                        onChange={(e) => setDeadline(e.target.checked ? '' : new Date().toISOString().split('T')[0])}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-3 h-3"
+                      />
+                      <label htmlFor="leaveDeadlineBlank" className="text-[10px] text-slate-600 cursor-pointer select-none">
+                        Manual entry
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Final Deadline</label>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="date" 
+                      value={finalDeadline}
+                      onChange={(e) => setFinalDeadline(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[10px] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:opacity-50"
+                      disabled={finalDeadline === ''}
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <input 
+                        type="checkbox" 
+                        id="leaveFinalDeadlineBlank"
+                        checked={finalDeadline === ''}
+                        onChange={(e) => setFinalDeadline(e.target.checked ? '' : new Date().toISOString().split('T')[0])}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-3 h-3"
+                      />
+                      <label htmlFor="leaveFinalDeadlineBlank" className="text-[10px] text-slate-600 cursor-pointer select-none">
+                        Manual entry
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Submission / Assessment</label>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="date" 
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[10px] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow disabled:opacity-50"
+                      disabled={date === ''}
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <input 
+                        type="checkbox" 
+                        id="leaveDateBlank"
+                        checked={date === ''}
+                        onChange={(e) => setDate(e.target.checked ? '' : new Date().toISOString().split('T')[0])}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer w-3 h-3"
+                      />
+                      <label htmlFor="leaveDateBlank" className="text-[10px] text-slate-600 cursor-pointer select-none">
+                        Manual entry
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -329,7 +406,7 @@ export default function App() {
 
           {/* 3. Learner Registry */}
           <div className="lg:col-span-8 lg:row-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5 flex flex-col">
-            <h2 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">3. Learner Registry (Capacity: {learners.length < 10 ? `0${learners.length}` : learners.length} / 10)</h2>
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">3. Learner Registry (Capacity: {learners.length < 10 ? `0${learners.length}` : learners.length} / 15)</h2>
             <div className="flex-grow overflow-auto min-h-[300px]">
               <table className="w-full text-left">
                 <thead className="sticky top-0 bg-white z-10 border-b border-slate-100">
@@ -395,10 +472,10 @@ export default function App() {
             <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-100 text-center transition-colors hover:bg-slate-100/80">
               <button 
                 onClick={addLearner}
-                disabled={learners.length >= 10}
+                disabled={learners.length >= 15}
                 className="text-xs uppercase tracking-wider font-bold text-indigo-600 hover:text-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed w-full h-full"
               >
-                + Add New Learner (Up to 10 max)
+                + Add New Learner (Up to 15 max)
               </button>
             </div>
           </div>
